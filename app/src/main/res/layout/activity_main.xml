@@ -12,6 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <com.daisa.kreader.GraphicOverlay
+        android:id="@+id/graphicOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="@id/viewFinder"
+        app:layout_constraintLeft_toLeftOf="@id/viewFinder"
+        app:layout_constraintRight_toRightOf="@id/viewFinder"
+        app:layout_constraintTop_toTopOf="@id/viewFinder" />
+
     <Button
         android:id="@+id/image_capture_button"
         android:layout_width="110dp"
