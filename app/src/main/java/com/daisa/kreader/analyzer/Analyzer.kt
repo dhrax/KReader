@@ -6,24 +6,25 @@ import androidx.camera.core.ImageProxy
 import com.daisa.kreader.GraphicOverlay
 import com.daisa.kreader.barcodescanner.BarcodeScannerProcessor
 import com.daisa.kreader.labeldetector.ImageLabelerProcessor
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 
-class Analyzer(graphicOverlay: GraphicOverlay?) : ImageAnalysis.Analyzer {
+class Analyzer(
+    graphicOverlay: GraphicOverlay?,
+    private val barcodeScannerProcessor: BarcodeScannerProcessor
+) : ImageAnalysis.Analyzer {
 
     private val TAG = "KReader"
     private var graphicOverlay: GraphicOverlay? = null
-    var barcodeScannerProcessor: BarcodeScannerProcessor
     var imageLabelerProcessor: ImageLabelerProcessor
+
 
     init {
         this.graphicOverlay = graphicOverlay
-        val barcodeOptions = BarcodeScannerOptions.Builder().build()
-        barcodeScannerProcessor = BarcodeScannerProcessor(barcodeOptions)
+
         val labererOptions = ImageLabelerOptions.Builder()
-             .setConfidenceThreshold(0.9f)
-             .build()
+            .setConfidenceThreshold(0.9f)
+            .build()
         imageLabelerProcessor = ImageLabelerProcessor(labererOptions)
     }
 
@@ -48,7 +49,7 @@ class Analyzer(graphicOverlay: GraphicOverlay?) : ImageAnalysis.Analyzer {
                 .addOnFailureListener { e ->
                     barcodeScannerProcessor.onFailure(e)
                 }
-                .addOnCompleteListener{
+                .addOnCompleteListener {
                     //barcodeScannerProcessor.OnComplete(mediaImage, image)
                 }
 
@@ -66,5 +67,7 @@ class Analyzer(graphicOverlay: GraphicOverlay?) : ImageAnalysis.Analyzer {
                     imageLabelerProcessor.onComplete(mediaImage, image)
                 }
         }
+
+
     }
 }

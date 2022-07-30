@@ -1,4 +1,4 @@
-package com.daisa.kreader
+package com.daisa.kreader.activity
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -17,12 +17,17 @@ import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.daisa.kreader.CustomImageSavedCallback
+import com.daisa.kreader.GraphicOverlay
 import com.daisa.kreader.analyzer.Analyzer
+import com.daisa.kreader.barcodescanner.BarcodeScannerProcessor
 import com.daisa.kreader.databinding.ActivityMainBinding
+import com.daisa.kreader.getoutputOptions
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity() {
+class LivePreviewActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
 
     private var imageCapture: ImageCapture? = null
@@ -36,6 +41,8 @@ class MainActivity : AppCompatActivity() {
     private var graphicOverlay: GraphicOverlay? = null
     private var imageAnalyzer: ImageAnalysis? = null
 
+    var barcodeScannerProcessor: BarcodeScannerProcessor? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -48,8 +55,12 @@ class MainActivity : AppCompatActivity() {
             startCamera()
         } else {
             ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+            )
         }
+
+        val barcodeOptions = BarcodeScannerOptions.Builder().build()
+        barcodeScannerProcessor = BarcodeScannerProcessor(barcodeOptions)
 
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
@@ -139,6 +150,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        barcodeScannerProcessor!!.shouldProcess = true
+    }
+
     companion object {
         private const val TAG = "KReader"
         private const val REQUEST_CODE_PERMISSIONS = 10
@@ -158,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         imageAnalyzer = builder.build()
 
         imageAnalyzer?.setAnalyzer(
-            cameraExecutor, Analyzer(graphicOverlay)
+            cameraExecutor, Analyzer(graphicOverlay, barcodeScannerProcessor!!)
         )
 
     }

@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_link_preview.xml" value="0.3605072463768116" />
         <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_main.xml" value="0.4425925925925926" />
         <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_main2.xml" value="0.2875905797101449" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_wi_fi_preview.xml" value="0.3605072463768116" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/xml/network_security_config.xml" value="0.3605072463768116" />
       </map>
     </option>
   </component>

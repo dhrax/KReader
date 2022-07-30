@@ -34,4 +34,5 @@ fun getoutputOptions(contentResolver: ContentResolver): ImageCapture.OutputFileO
 
 object Constants{
     const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+    const val TAG = "KReader"
 }
