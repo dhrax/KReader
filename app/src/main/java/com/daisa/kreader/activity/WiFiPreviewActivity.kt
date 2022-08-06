@@ -74,12 +74,4 @@ class WiFiPreviewActivity : AppCompatActivity() {
 
 
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            wifiManager.removeNetworkSuggestions(wifiManager.networkSuggestions)
-        }
-    }
 }

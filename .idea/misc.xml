@@ -3,10 +3,21 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/drawable/ic_menu_slideshow.xml" value="0.161" />
         <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_link_preview.xml" value="0.3605072463768116" />
         <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_main.xml" value="0.4425925925925926" />
         <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_main2.xml" value="0.2875905797101449" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_test.xml" value="0.31354166666666666" />
         <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/activity_wi_fi_preview.xml" value="0.3605072463768116" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/app_bar_test.xml" value="0.31354166666666666" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/content_test.xml" value="0.31354166666666666" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/drawer_layout.xml" value="0.3605072463768116" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/fragment_gallery.xml" value="0.31354166666666666" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/fragment_home.xml" value="0.31354166666666666" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/fragment_slideshow.xml" value="0.31354166666666666" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/layout/nav_header_test.xml" value="0.31354166666666666" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/menu/activity_main_drawer.xml" value="0.5536458333333333" />
+        <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/menu/test.xml" value="0.5536458333333333" />
         <entry key="..\:/Users/david/Desktop/GitHub/David/KReader/app/src/main/res/xml/network_security_config.xml" value="0.3605072463768116" />
       </map>
     </option>

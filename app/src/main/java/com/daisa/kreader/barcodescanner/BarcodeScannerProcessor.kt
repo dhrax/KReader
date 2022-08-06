@@ -72,8 +72,8 @@ class BarcodeScannerProcessor (options: BarcodeScannerOptions){
                         shouldProcess = false
                     }
                     Barcode.TYPE_PRODUCT ->{
-                        val test = barcode.displayValue
-                        Log.d(TAG, "Codigo decodificado PRODUCT: titulo: $test")
+                        val displayValue = barcode.displayValue
+                        Log.d(TAG, "Codigo decodificado PRODUCT: displayValue: $displayValue")
                     }
                     else ->
                         Log.d(TAG, "Se ha detectado un codigo desconocido ${barcode.valueType}")
@@ -88,8 +88,8 @@ class BarcodeScannerProcessor (options: BarcodeScannerOptions){
         Log.d(TAG, "BarcodeScannerProcessor OnFailureListener")
     }
 
-    fun onComplete(mediaImage: Image, image: ImageProxy) {
-        mediaImage.close()
+    fun onComplete(image: Image, imageProxy: ImageProxy) {
         image.close()
+        imageProxy.close()
     }
 }

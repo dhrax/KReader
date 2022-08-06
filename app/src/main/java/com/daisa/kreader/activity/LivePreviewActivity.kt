@@ -2,10 +2,13 @@ package com.daisa.kreader.activity
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -17,18 +20,19 @@ import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.daisa.kreader.CustomImageSavedCallback
-import com.daisa.kreader.GraphicOverlay
+import com.daisa.kreader.*
 import com.daisa.kreader.analyzer.Analyzer
 import com.daisa.kreader.barcodescanner.BarcodeScannerProcessor
-import com.daisa.kreader.databinding.ActivityMainBinding
-import com.daisa.kreader.getoutputOptions
+import com.daisa.kreader.databinding.DrawerLayoutBinding
+import com.google.android.material.navigation.NavigationView
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.common.InputImage
+import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class LivePreviewActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityMainBinding
+class LivePreviewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+    private lateinit var viewBinding: DrawerLayoutBinding
 
     private var imageCapture: ImageCapture? = null
 
@@ -43,12 +47,43 @@ class LivePreviewActivity : AppCompatActivity() {
 
     var barcodeScannerProcessor: BarcodeScannerProcessor? = null
 
+    var navView : NavigationView? = null
+    var analyzer : Analyzer? = null
+
+    //todo cleanup
+    val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        Log.d(Constants.TAG, "Uri de la foto seleccionada: $uri")
+        val inputImage: InputImage
+        try {
+            inputImage = InputImage.fromFilePath(this, uri!!)
+
+            val result = barcodeScannerProcessor!!.detectInImage(inputImage)
+            result
+                .addOnSuccessListener { barcodes ->
+                    Log.d(Constants.TAG, "imagen detectada con exito")
+                    if(barcodes.isEmpty()){
+                        Log.d(Constants.TAG, "No se ha encontrado ningun codigo valido en la imagen: $uri")
+                        Toast.makeText(this, "No se ha encontrado ningun codigo valido", Toast.LENGTH_SHORT).show()
+                    }else{
+                        barcodeScannerProcessor!!.onSuccess(barcodes, graphicOverlay!!)
+                    }
+                }
+                .addOnFailureListener {
+                    Log.d(Constants.TAG, "Error Al detectar imagen")
+                    barcodeScannerProcessor!!.onFailure(it)
+                }
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        viewBinding = DrawerLayoutBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        graphicOverlay = viewBinding.graphicOverlay
+        graphicOverlay = viewBinding.livePreviewActivity.graphicOverlay
 
         // Request camera permissions
         if (allPermissionsGranted()) {
@@ -62,11 +97,18 @@ class LivePreviewActivity : AppCompatActivity() {
         val barcodeOptions = BarcodeScannerOptions.Builder().build()
         barcodeScannerProcessor = BarcodeScannerProcessor(barcodeOptions)
 
+        analyzer = Analyzer(graphicOverlay, barcodeScannerProcessor!!)
+
         // Set up the listeners for take photo and video capture buttons
-        viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-        viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
+        viewBinding.livePreviewActivity.imageCaptureButton.setOnClickListener { takePhoto() }
+        viewBinding.livePreviewActivity.videoCaptureButton.setOnClickListener { captureVideo() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        navView = viewBinding.navView
+        navView!!.setNavigationItemSelectedListener(this)
+
+
     }
 
     private fun takePhoto() {
@@ -93,7 +135,7 @@ class LivePreviewActivity : AppCompatActivity() {
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
+                    it.setSurfaceProvider(viewBinding.livePreviewActivity.viewFinder.surfaceProvider)
                 }
 
             imageCapture = ImageCapture.Builder().build()
@@ -174,8 +216,19 @@ class LivePreviewActivity : AppCompatActivity() {
         imageAnalyzer = builder.build()
 
         imageAnalyzer?.setAnalyzer(
-            cameraExecutor, Analyzer(graphicOverlay, barcodeScannerProcessor!!)
+            cameraExecutor, analyzer!!
         )
 
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.nav_gallery ->{
+                Log.d(Constants.TAG, "Abriendo galeria")
+                getContent.launch("image/*")
+            }
+        }
+
+        return true
     }
 }
