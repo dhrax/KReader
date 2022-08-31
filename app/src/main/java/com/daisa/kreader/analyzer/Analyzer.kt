@@ -50,10 +50,10 @@ class Analyzer(
                     barcodeScannerProcessor.onFailure(e)
                 }
                 .addOnCompleteListener {
-                    //barcodeScannerProcessor.OnComplete(mediaImage, image)
+                    barcodeScannerProcessor.onComplete(mediaImage, image)
                 }
 
-            val labelResult = imageLabelerProcessor.detectInImage(inputImage)
+            /*val labelResult = imageLabelerProcessor.detectInImage(inputImage)
 
             labelResult
                 .addOnSuccessListener { labels ->
@@ -66,6 +66,8 @@ class Analyzer(
                     //closing the images when this processor finishes to be able to have one barcodeScannerProcessor and one imageLabelerProcessor working at the same time
                     imageLabelerProcessor.onComplete(mediaImage, image)
                 }
+                */
+
         }
 
 

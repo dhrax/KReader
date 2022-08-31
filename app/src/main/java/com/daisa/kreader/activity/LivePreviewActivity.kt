@@ -1,6 +1,7 @@
 package com.daisa.kreader.activity
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -9,6 +10,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -24,6 +26,8 @@ import com.daisa.kreader.*
 import com.daisa.kreader.analyzer.Analyzer
 import com.daisa.kreader.barcodescanner.BarcodeScannerProcessor
 import com.daisa.kreader.databinding.DrawerLayoutBinding
+import com.daisa.kreader.db.viewmodel.CodeViewModel
+import com.daisa.kreader.db.viewmodel.CodeViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.common.InputImage
@@ -78,6 +82,10 @@ class LivePreviewActivity : AppCompatActivity(), NavigationView.OnNavigationItem
         }
     }
 
+    private val codeViewModel: CodeViewModel by viewModels {
+        CodeViewModelFactory((application as QRApplication).repository)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = DrawerLayoutBinding.inflate(layoutInflater)
@@ -95,7 +103,7 @@ class LivePreviewActivity : AppCompatActivity(), NavigationView.OnNavigationItem
         }
 
         val barcodeOptions = BarcodeScannerOptions.Builder().build()
-        barcodeScannerProcessor = BarcodeScannerProcessor(barcodeOptions)
+        barcodeScannerProcessor = BarcodeScannerProcessor(barcodeOptions, codeViewModel)
 
         analyzer = Analyzer(graphicOverlay, barcodeScannerProcessor!!)
 
@@ -226,6 +234,10 @@ class LivePreviewActivity : AppCompatActivity(), NavigationView.OnNavigationItem
             R.id.nav_gallery ->{
                 Log.d(Constants.TAG, "Abriendo galeria")
                 getContent.launch("image/*")
+            }
+            R.id.nav_history ->{
+                val historyIntent = Intent(this, HistoryActivity::class.java)
+                startActivity(historyIntent)
             }
         }
 
