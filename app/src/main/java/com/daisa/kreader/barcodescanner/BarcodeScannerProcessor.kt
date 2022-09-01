@@ -17,10 +17,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
@@ -51,8 +48,6 @@ class BarcodeScannerProcessor(options: BarcodeScannerOptions, val codeViewModel:
                 graphicOverlay.add(BarcodeGraphic(graphicOverlay, barcode))
 
                 val valueType = barcode.valueType
-                Log.d(Constants.TAG, "barccode.displayValue: ${barcode.displayValue}")
-                Log.d(Constants.TAG, "barccode.rawValue: ${barcode.rawValue}")
                 // See API reference for complete list of supported types
                 when (valueType) {
                     Barcode.TYPE_WIFI -> {
@@ -64,8 +59,11 @@ class BarcodeScannerProcessor(options: BarcodeScannerOptions, val codeViewModel:
                             TAG,
                             "Codigo decodificado WIFI: ssid: $ssid, password: $password, type: $type"
                         )
-
-                        insertToHistory(barcode.displayValue!!, CodeType.WIFI)
+                        shouldProcess = false
+                        insertToHistory(
+                            barcode.displayValue!!,
+                            CodeType.WIFI
+                        )
 
                         val wifiIntent =
                             Intent(graphicOverlay.context, WiFiPreviewActivity::class.java)
@@ -75,7 +73,7 @@ class BarcodeScannerProcessor(options: BarcodeScannerOptions, val codeViewModel:
                                     putExtra("type", type)
                                 }
                         graphicOverlay.context.startActivity(wifiIntent)
-                        shouldProcess = false
+
                     }
                     Barcode.TYPE_URL -> {
                         val title = barcode.url!!.title
@@ -95,12 +93,18 @@ class BarcodeScannerProcessor(options: BarcodeScannerOptions, val codeViewModel:
                     Barcode.TYPE_PRODUCT -> {
                         val displayValue = barcode.displayValue
                         Log.d(TAG, "Codigo decodificado PRODUCT: displayValue: $displayValue")
-                        insertToHistory(barcode.displayValue!!, CodeType.PRODUCT)
+                        insertToHistory(
+                            barcode.displayValue!!,
+                            CodeType.PRODUCT
+                        )
                     }
                     Barcode.TYPE_TEXT -> {
                         val value = barcode.displayValue
                         Log.d(TAG, "Codigo decodificado TEXT: value: $value")
-                        insertToHistory(barcode.displayValue!!, CodeType.TEXT)
+                        insertToHistory(
+                            barcode.displayValue!!,
+                            CodeType.TEXT
+                        )
                     }
                     else ->
                         Log.d(TAG, "Se ha detectado un codigo desconocido ${barcode.valueType}")
@@ -130,14 +134,20 @@ class BarcodeScannerProcessor(options: BarcodeScannerOptions, val codeViewModel:
 
 
         dispatcherScope.launch(Dispatchers.IO) {
-            Log.d(Constants.TAG, "I'm working in thread ${Thread.currentThread().name}")
-            if (codeViewModel.repository.getCodeByText(code.text) == 0) {
-                Log.d(Constants.TAG, "Insertando codigo nuevo")
-                codeViewModel.repository.insert(code)
-            } else {
-                Log.d(Constants.TAG, "Codigo ya insertado")
+            runBlocking {
+                Log.d(Constants.TAG, " 1 I'm working in thread ${Thread.currentThread().name}")
+                if (codeViewModel.existsCode(code.text) == 0) {
+                    Log.d(Constants.TAG, "Insertando codigo nuevo")
+                    Log.d(Constants.TAG, "2 I'm working in thread ${Thread.currentThread().name}")
+                    codeViewModel.insert(code)
+                } else {
+                    Log.d(Constants.TAG, "Codigo ya insertado")
+                }
             }
+
         }
+
+
 
 
     }

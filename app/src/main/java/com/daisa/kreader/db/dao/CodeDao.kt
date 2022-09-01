@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.daisa.kreader.db.entity.Code
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CodeDao {
@@ -19,11 +20,11 @@ interface CodeDao {
     fun deleteCode(code: Code)
 
     @Query("SELECT * FROM codes")
-    suspend fun getAll() : List<Code>
+    fun getAll() : Flow<List<Code>>
 
     @Query("DELETE FROM codes")
     suspend fun deleteAll()
 
     @Query("SELECT COUNT(*) FROM codes where text = :text limit 1")
-    suspend fun getCodeByText(text: String) : Int
+    suspend fun existsCode(text: String) : Int
 }

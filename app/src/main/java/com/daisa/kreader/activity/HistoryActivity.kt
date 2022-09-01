@@ -4,14 +4,12 @@ import android.os.Bundle
 import android.widget.ListView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.daisa.kreader.QRApplication
 import com.daisa.kreader.adapter.HistoryAdapter
 import com.daisa.kreader.databinding.ActivityHistoryBinding
 import com.daisa.kreader.db.entity.Code
 import com.daisa.kreader.db.viewmodel.CodeViewModel
 import com.daisa.kreader.db.viewmodel.CodeViewModelFactory
-import kotlinx.coroutines.launch
 
 class HistoryActivity : AppCompatActivity() {
 
@@ -24,7 +22,7 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private val elements = ArrayList<Code>()
-    lateinit var adapter : HistoryAdapter
+    private lateinit var adapter : HistoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,22 +33,16 @@ class HistoryActivity : AppCompatActivity() {
 
         listView = viewBinding.list
 
-
         adapter =  HistoryAdapter(this, elements)
 
         listView.adapter = adapter
 
-
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        elements.clear()
-
-        lifecycleScope.launch {
-            elements.addAll(codeViewModel.repository.getAll())
-            adapter.notifyDataSetChanged()
+        codeViewModel.allCodes.observe(this) { codes ->
+            codes?.let {
+                elements.clear()
+                elements.addAll(codes)
+                adapter.notifyDataSetChanged()
+            }
         }
     }
 }

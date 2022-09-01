@@ -1,34 +1,44 @@
 package com.daisa.kreader.db.viewmodel
 
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.daisa.kreader.Constants
 import com.daisa.kreader.db.entity.Code
 import com.daisa.kreader.db.repository.CodeRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class CodeViewModel(val repository: CodeRepository): ViewModel() {
+class CodeViewModel(val repository: CodeRepository) : ViewModel() {
 
 
-    fun insert(code: Code) = viewModelScope.launch {
+    suspend fun insert(code: Code) {
+        Log.d(Constants.TAG, "insert I'm working in thread ${Thread.currentThread().name}")
         repository.insert(code)
+
     }
 
-    fun getAll() = viewModelScope.launch {
-        repository.getAll()
-    }
+    fun existsCode(text: String): Int {
+        var result = -1
+        runBlocking {
 
-    fun getCodeByText(text: String) = viewModelScope.launch {
-        repository.getCodeByText(text)
-    }
-}
+            val job =
+                viewModelScope.launch {
+                    Log.d(
+                        Constants.TAG,
+                        "existsCode I'm working in thread ${Thread.currentThread().name}"
+                    )
+                    result = repository.existsCode(text)
+                }
+            job.join()
 
-class CodeViewModelFactory(private val repository: CodeRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CodeViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return CodeViewModel(repository) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+
+        return result
     }
+
+    val allCodes: LiveData<List<Code>> = repository.getAll().asLiveData()
 }
+
